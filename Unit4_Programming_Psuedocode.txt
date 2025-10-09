@@ -1,1 +1,58 @@
+BEGIN PROGRAM
+ DISPLAY "Welcome to North Sussex Judo Monthly Fees Calculator"
 
+REPEAT
+ INPUT athlete_name
+ DISPLAY "Select training plan: Beginner, Intermediate or Advanced"
+ INPUT training_plan
+ VALIDATE training_plan IS one of [Beginner, Intermediate, Elite]
+
+ INPUT current_weight_kg
+ DISPLAY "Select compeition weight category"
+ DISPLAY "Flyweight, Lightweight, Light-Middelweight, Middleweight, Light-Heavyweight, Heavyweight"
+ INPUT competition_category
+ VALIDATE competition_category IS valid
+
+ IF training_plan = "Beginner" THEN 
+ competiton = 0
+ DISPLAY "Beginners cannot enter competitions" 
+ELSE
+ INPUT number_of_competitions 
+ VALIDATE number_of_competitions >= 0
+ENDIF
+
+INPUT private_hours
+IF private_hours > 20 THEN 
+ DISPLAY "Maximum of 20 hours allowed per month, adjusting to 20"
+ private_hours = 20
+ENDIF
+
+IF training_plan = "Beginner" THEN 
+ weekly_fee = 25.00
+ELSE IF training_plan = "Intermediate" THEN 
+ weekly_fee = 30.00
+ELSE IF training_plan = "Advanced" THEN
+ weekly_fee 35.00
+ENDIF
+
+training_cost = weekly_fee * 4
+private_cost = private_hours * 9.50
+competition_cost = number_of_competitions * 22.00
+total_cost = training_cost + private_cost + competition_cost
+
+category_limit = GET_LIMIT_FOR(competition_category)
+IF category_limit = "Unlimited" THEN
+ weight_message = "No uppler limit for Heavyweight category"
+ELSE IF current_weight_kg > category_limit THEN 
+ weight_message = "Athlete is WITHIN category limits"
+ENDIF
+
+DISPLAY athlete_name, training_plan, and inventories monthly cost
+DISPLAY total cost and weight_message
+
+DISPLAY "Would you like to enter another athlete (Y/N)"
+ INPUT choice 
+UNTIL choice = "N" OR choice = "n"
+
+DISPLAY "Thank you for using North Sussex Judo Calculator"
+END PROGRAM
