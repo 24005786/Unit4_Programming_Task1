@@ -1,7 +1,24 @@
-BEGIN PROGRAM
- DISPLAY "Welcome to North Sussex Judo Monthly Fees Calculator"
+BEGIN PROGRAM 
+ DISPLAY "Welcome to North Sussex Judo Monthly Fees Calculator"  
+
+// Pricing Constants (GBP)
+ SET WEEKLY_FEE ["Beginner"] = 25.00
+ SET WEEKLY_FEE ["INTERMEDIATE"] = 30.00
+ SET WEEKLY_FEE["ELITE"] = 35.00
+ SET COACH_RATE_PER_HOUR = 9.50
+ SET COMP_ENTRY_FEE = 22.00
+ SET WEEKS_PER_MONTH = 4
+
+// Weight Category Upper Limits (kg)
+ SET CATEGORY_LIMIT ["FLYWEIGHT"] = 66
+ SET CATEGORY_LIMIT ["LIGHTWEIGHT"] = 73
+ SET CATEGORY_LIMIT ["LIGHT-MIDDLEWEIGHT"] = 81
+ SET CATEGORY_LIMIT ["MIDDELWEIGHT"] = 90
+ SET CATEGORY_LIMIT ["LIGHT-HEAVYWEIGHT"] = 100
+ SET CATEGORY_LIMIT ["HEAVYWEIGHT"] = "Unlimited" // > 100 kg
 
 REPEAT
+// Inputs with validation
  INPUT athlete_name
  DISPLAY "Select training plan: Beginner, Intermediate or Elite"
  INPUT training_plan
@@ -18,41 +35,57 @@ REPEAT
  DISPLAY "Beginners cannot enter competitions" 
 ELSE
  INPUT number_of_competitions 
- VALIDATE number_of_competitions >= 0
+ UNTIL IS_INTEGER(number_of_competitions) AND number_of_competitions >=0 
+ ENDIF
+
+// Private Coaching Sessions: 0-5 hours per week, month = 4 weeks
+REPEAT 
+DISPLAY "Enter number of private coaching hours per week (0-5):"
+INPUT private_coaching_hours_per_weeK
+UNTIL IS_NUMERIC(private_coaching_hours_per_week) AND private_coaching_hours_per_weeK >=0 AND private_coaching_hours_per_week <=5
+SET private_coaching_hours_per_month = private_coaching_hours_per_week * WEEKS_PER_MONTH
+
+// Calculations 
+SET weekly_fee = WEEKLY_FEE[training_plan]
+SET training_cost = weekly_fee * WEEKS_PER_MONTH
+SET private_cost = private_coaching_hours_per_month * COACH_RATE_PER_HOUR
+SET competition_cost = number_of_competitions * COMP_ENTRY_FEE
+SET toal_cost = training_cost + private_cost + competition_cost
+
+// Weight Comparison
+SET limit = CATEGORY_LIMIT [Competition_category]
+IF limit = "Unlimited" THEN
+weight_status = "No weight limit for Heavyweight category"
+ELSE 
+IF current_weight_kg > limit THEN 
+weight_message = "You are over the limit by" + (current_weight_kg - limit) + "kg" 
+ELSE 
+IF current_weight_kg < limit THEN 
+weight_message = "You are under the limit by" + (limit - current_weight_kg) + "kg" 
+ELSE 
+weight_message = "You are exactly at the limit of" + limit " kg"  
+ENDIF
 ENDIF
 
-INPUT private_hours
-IF private_hours > 20 THEN 
- DISPLAY "Maximum of 20 hours allowed per month, adjusting to 20"
- private_hours = 20
-ENDIF
+// Output 
+DISPLAY "Athlete:" + athlete_name
+DISPLAY "Plan selected" + training_plan
+DISPLAY "Itemised monthly costs:"
+DISPLAY "Training (" + Format(weekly_fee, 2) + " x " + WEEKS_PER_MONTH + "): £" + FORMAT(training_cost, 2)
+DISPLAY "Private coaching (" + private_coaching_hours_per_month + "hrs x £" + FORMAT(COACH_RATE_PER_HOUR, 2) + "): £" + FORMAT(private_cost, 2)
+DISPLAY "Competitions (" + number_of_competitions + " x £" + FORMAT(COMP_ENTRY_FEE, 2) + "): £" + FORMAT(competition_cost, 2) 
+DISPLAY "TOTAL monthly cost: £" + FORMAT(total_cost, 2)
+DISPLAY "Weight_message" 
 
-IF training_plan = "Beginner" THEN 
- weekly_fee = 25.00
-ELSE IF training_plan = "Intermediate" THEN 
- weekly_fee = 30.00
-ELSE IF training_plan = "Advanced" THEN
- weekly_fee 35.00
-ENDIF
+// Optionally store record for summary/reporting
+APPEND [athlete_name, training_plan, training_cost, private_cost, competition_cost, total_cost, weight_message] TO ATHLETES
 
-training_cost = weekly_fee * 4
-private_cost = private_hours * 9.50
-competition_cost = number_of_competitions * 22.00
-total_cost = training_cost + private_cost + competition_cost
+// Loop control with validation
+REPEAT 
+DISPLAY "Add another athlete? (Yes/No):" 
+INPUT choice 
+UNTIL choice IN ["Yes","yes","No","no"]
+UNTIL choice IN ("N", "n")
 
-category_limit = GET_LIMIT_FOR(competition_category)
-IF category_limit = "Unlimited" THEN
- weight_message = "No uppler limit for Heavyweight category"
-ELSE IF current_weight_kg > category_limit THEN 
- weight_message = "Athlete is WITHIN category limits"
-ENDIF
-
-DISPLAY athlete_name, training_plan, and inventories monthly cost
-DISPLAY total cost and weight_message
-
-DISPLAY "Would you like to enter another athlete (Y/N)"
- INPUT choice 
-UNTIL choice = "N" OR choice = "n"
-
-DISPLAY "Thank you for using North Sussex Judo Calculator"
-END PROGRAM
+DISPLAY "Thank you for using the North Sussex Judo Monthly Fees Calculator" 
+END PROGRAM 
