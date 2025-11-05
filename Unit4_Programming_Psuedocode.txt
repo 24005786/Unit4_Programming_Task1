@@ -3,18 +3,18 @@ BEGIN PROGRAM
 
 REPEAT
  INPUT athlete_name
- DISPLAY "Select training plan: Beginner, Intermediate or Advanced"
+ DISPLAY "Select training plan: Beginner, Intermediate or Elite"
  INPUT training_plan
  VALIDATE training_plan IS one of [Beginner, Intermediate, Elite]
 
  INPUT current_weight_kg
  DISPLAY "Select compeition weight category"
- DISPLAY "Flyweight, Lightweight, Light-Middelweight, Middleweight, Light-Heavyweight, Heavyweight"
+ DISPLAY "Flyweight, Lightweight, Light-Middleweight, Middleweight, Light-Heavyweight, Heavyweight"
  INPUT competition_category
  VALIDATE competition_category IS valid
 
  IF training_plan = "Beginner" THEN 
- competiton = 0
+ competitons = 0
  DISPLAY "Beginners cannot enter competitions" 
 ELSE
  INPUT number_of_competitions 
